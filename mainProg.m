@@ -307,7 +307,7 @@ hold on
 plot3(x0,y0,z0,'gs')
 plot3(xend,yend,zend,'rd')
 plot3(path(:,2),path(:,1),path(:,3),'wx')
-% plot3(path(:,2),path(:,1),path(:,3),'linewidth',2,'Color',[1 0 0])
+plot3(path(:,2),path(:,1),path(:,3),'linewidth',2,'Color',[1 0 0])
 % plot3(a,b,c,'linewidth',4,'Color',[1 0 0]);
 axis tight
 axis equal
@@ -322,7 +322,7 @@ colorbar
 %figure(4), clf
 hold on
          title('UAV')
-         xlabel('East')
+%         xlabel('East')
 %         ylabel('North')
 %         zlabel('-Down')
 %         view(45*7,90)  % set the view angle for figure
@@ -393,10 +393,10 @@ hold on
 % plot3(path(:,2),path(:,1),path(:,3),'wx')
 % plot3(path(:,2),path(:,1),path(:,3),'linewidth',2,'Color',[1 0 0])
 
-plot3(X,Y,Z,'linewidth',5,'Color',[1 1 0]);
+plot3(X,Y,Z,'linewidth',1,'Color',[1 1 0]);
 theta_node= [fx;fy;fz];
 
-% disp(theta_node);
+disp(theta_node);
 % plot3(X,Y,Z,'linewidth',2,'Color',[1 0 1]);
 
 hold off
@@ -430,9 +430,10 @@ aircraft_handle = drawBody(Vertices,Faces,facecolors,...
 
 %[b a] = (size(X));
 %DSFSDFS
-
-
-
+flag = 1;
+height = 0;
+heading = -1;
+temp=0;
 %iki opo
  for i=2:b
 %     xf = path(i-1,2);
@@ -449,15 +450,38 @@ aircraft_handle = drawBody(Vertices,Faces,facecolors,...
     ye = Y(1,i);
     ze = Z(1,i);
     
-    if i>2 && i <=202 || i>203 && i <=403 || i>403 && i <603 
+    
+    if i>2 && i < 203 || i>203 && i <404 || i>404 && i <605  || i > 605 && i <806  || i>806 && i <1208  
         n_max = 2;
     else
         n_max = 300;
     end
         
-        Pmatrix = [(linspace(xf,xe,n_max));
-        (linspace(yf,ye,n_max));
-        (linspace(-zf,-ze,n_max))];  
+    if xe - xf > 2
+        heading = heading + 1;
+    end    
+    
+        if ze - zf ~= 0
+            flag = 0;
+        end
+        
+        if ze - zf == 0
+            if flag == 0
+            temp = temp +1 ;
+            if temp > 5
+                height = height +1;
+                temp = 0
+                flag =1;
+            end
+            end
+        end
+        
+        xlabel( height)
+        ylabel( heading)
+        
+        Pmatrix = [ (linspace( xf, xe,n_max));
+                    (linspace( yf, ye,n_max));
+                    (linspace(-zf,-ze,n_max))];  
     
     
     for c = 2:n_max
@@ -468,7 +492,6 @@ aircraft_handle = drawBody(Vertices,Faces,facecolors,...
         X1 = Pmatrix(1,c-1);
         X2 = Pmatrix(1,c);
        
-        
         s(1:3,:)=[X1;Y1;Z1];
         s(4:6,:)=[X2;Y2;Z2];
         

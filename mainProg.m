@@ -208,7 +208,7 @@ sizeEd = size(G.Edges);
 K=[kg kh ke];
 %Measure path computation  
  
-tic                                          
+tic=0                                          
 %Generate path 
 [path,n_points]=theta_star_3D(K,E3d_safe,x0,y0,z0,xend,yend,zend,sizeE);
 T_path=toc;
@@ -393,7 +393,7 @@ hold on
 % plot3(path(:,2),path(:,1),path(:,3),'wx')
 % plot3(path(:,2),path(:,1),path(:,3),'linewidth',2,'Color',[1 0 0])
 
-plot3(X,Y,Z,'linewidth',1,'Color',[1 1 0]);
+plot3(X,Y,Z,'linewidth',2,'Color',[1 1 1]);
 theta_node= [fx;fy;fz];
 
 disp(theta_node);
@@ -430,12 +430,17 @@ aircraft_handle = drawBody(Vertices,Faces,facecolors,...
 
 %[b a] = (size(X));
 %DSFSDFS
+time=0;
 flag = 1;
 height = 0;
 heading = -1;
 temp=0;
+
+
+
 %iki opo
- for i=2:b
+
+  for i=2:b
 %     xf = path(i-1,2);
 %     yf = path(i-1,1);
 %     zf = path(i-1,3);
@@ -449,13 +454,11 @@ temp=0;
     xe = X(1,i);
     ye = Y(1,i);
     ze = Z(1,i);
+    delta = abs(xf - xe);
+    disp(delta);
     
-    
-    if i>2 && i < 203 || i>203 && i <404 || i>404 && i <605  || i > 605 && i <806  || i>806 && i <1208  
-        n_max = 2;
-    else
-        n_max = 300;
-    end
+        n_max = (xe-xf)/0.02;
+
         
     if xe - xf > 2
         heading = heading + 1;
@@ -470,14 +473,11 @@ temp=0;
             temp = temp +1 ;
             if temp > 5
                 height = height +1;
-                temp = 0
+                temp = 0;
                 flag =1;
             end
             end
         end
-        
-        xlabel( height)
-        ylabel( heading)
         
         Pmatrix = [ (linspace( xf, xe,n_max));
                     (linspace( yf, ye,n_max));
@@ -485,15 +485,16 @@ temp=0;
     
     
     for c = 2:n_max
-        Z1 = Pmatrix(3,c-1);
-        Z2 = Pmatrix(3,c);
-        Y1 = Pmatrix(2,c-1);
-        Y2 = Pmatrix(2,c);
-        X1 = Pmatrix(1,c-1);
-        X2 = Pmatrix(1,c);
-       
-        s(1:3,:)=[X1;Y1;Z1];
-        s(4:6,:)=[X2;Y2;Z2];
+
+            Z1 = Pmatrix(3,c-1);
+            Z2 = Pmatrix(3,c);
+            Y1 = Pmatrix(2,c-1);
+            Y2 = Pmatrix(2,c);
+            X1 = Pmatrix(1,c-1);
+            X2 = Pmatrix(1,c);
+            
+        s(1:3)=[X1;Y1;Z1];
+        s(4:6)=[X2;Y2;Z2];
         
         %s(7,:)=unifrnd(-0.0*pi,0.0*pi,[1,n]);
         %s(8,:)=unifrnd(-0.0*pi,0.0*pi,[1,n]);
@@ -509,12 +510,12 @@ temp=0;
         vphi=s(10);vtheta=s(11);vpsi=s(12);
         
         vx=s(4);vy=s(5);vz=s(6);
-        x1 = X1;y1 = Y1;
-        x2 = X2;y2 = Y2;
+        
         [ang,rad] = getAngle([vx,vy],[x,y]);                
         psi = rad -(6.28/4);
         s(9) = psi;
-    
+        
+        s(13) = ((vx-x)/(dt*100))*3600;
         
         Pmatrix(1,c) = vx;
         Pmatrix(2,c) = vy;    
@@ -523,17 +524,30 @@ temp=0;
     pn       =  s(2);       % y position     
     pe       =  s(1);       % Pmatrix(1,c-1);       % x position
     pd       =  s(3);       % Pmatrix(3,c-1);       % z position
-    %disp(vpsi);
+    disp(s);
     
     
     drawBody(Vertices,Faces,facecolors,...
                      pn,pe,pd,-phi,theta,psi,...
                      aircraft_handle);
-    pause(0.00001);
+    tic=tic+1;
+%     if(tic==10) 
+%         time=time+1;
+%         tic=0;
+%     end
+    
+    xlabel(s(13))
+    ylabel(tic)
+    
     %hold off
     end
     
-end
+    
+    
+ end
+
+    semen1 = time;
+ 
 
 
 

@@ -1,15 +1,20 @@
 %Main
 clc
 clear
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 %path parameters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %size [y,x,z] and resolution
 sizeE=[150 150 30];
 d_grid=1;
+
 %Starting point
 x0=5;
 y0=5;
 z0=10;
+
 %Arrival point
 xend=125;
 yend=140;
@@ -17,21 +22,24 @@ zend=10;
 
 
 %% Defining environment variables
-start = [x0,y0];       % start position
-goal = [xend, yend];   % goal position
-%n = 2;                 % no. of obstacles
+start = [x0,y0];                                % start position
+goal = [xend, yend];                            % goal position
+%n = 2;                                         % no. of obstacles
 
 
 %Number of points with low elevation around start and end point area 
 n_low=3;
+
 %Theta * cost weights
 kg=1;
 kh=1.25;
 ke=sqrt((xend-x0)^2+(yend-y0)^2+(zend-z0)^2);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %Map definition
 %Average flight altitude
 h=max(z0,zend);
+
 %Points coordinates in [y,x,z] format
 P0=[y0 x0 z0];
 Pend=[yend xend zend];
@@ -46,6 +54,8 @@ keys = {'a',...
          'cw','cx','cy','cz','da','dd','dd','dd','de','df','dg','dh', 'di','dj','dk','dl','dm','dn','do','dp'...
          'dq','dr','ds','dt','du','dv','dw','dx','dy','dz','ea','eb','ec','ed','ee','ef','eg','eh', 'ei','ej',...
          'ek'};
+     
+     
 values = {start,...
                  [20,10],[20,30], [40,30], [40,10],...
                  [50,5], [50,25], [65,25], [65,5],....
@@ -83,6 +93,8 @@ values = {start,...
                  [20,30], [20,30], [40,30], [40,30],...
                  [40,30], [40,30], [40,30], [40,30],...
                  goal};
+             
+             
 key = {'a','b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't'};        
 nodes={          [20,10], [20,10], [20,10], [20,10],...
                  [20,10], [20,10], [20,10], [20,30],...
@@ -116,6 +128,9 @@ titik = [20,10,5];
 disp(size(keys));
 disp(size(values));
 disp(size(nodes));
+disp('Data^');
+   pause(2);
+   
 Map = containers.Map(keys, values);
 len = Map.values;
 %node
@@ -130,6 +145,7 @@ for i = 2:(length(2)-2)
     temp = [values{1,i}(1), values{1,i+1}(1), values{1,i}(2), values{1,i+1}(2)];
     edges = vertcat(edges, temp);                
 end
+
 % Removing edges which are not obstacle edges
 sizeEdges = size(edges);
 i = 4;
@@ -138,6 +154,7 @@ while i < (sizeEdges(1)-1)
     sizeEdges = size(edges);
     i = i + 3;
 end
+ 
 % Adding 1 edge pair in each obstacle which were not added in the earlier
 % for loop
 i = 2;
@@ -201,14 +218,14 @@ while i < (length(2)-2)
     i = i + 4;
 end
 visEd = G.Edges;  % visible edges
-sizeEd = size(G.Edges);
+ sizeEd = size(G.Edges);
 
 %Path generation
 %Store gains in vector
 K=[kg kh ke];
 %Measure path computation  
  
-tic=0                                          
+tic                                          
 %Generate path 
 [path,n_points]=theta_star_3D(K,E3d_safe,x0,y0,z0,xend,yend,zend,sizeE);
 T_path=toc;
@@ -247,7 +264,7 @@ disp(path_distance);
 disp('=======================');
 disp('computation time:'); toc;
 disp('=======================');
-
+pause(10);
 
 for i=1:sizeEd(1)
    x = visEd(i,1);
@@ -257,12 +274,12 @@ for i=1:sizeEd(1)
    
    xpoints = [p1(1,1), p2(1,1)];
    ypoints = [p1(1,2), p2(1,2)];
-   %disp('Point :');
-   %disp(p1);
-   %disp(xpoints);
-   %disp('Point Y:');
-   %disp(ypoints);
-   %disp('----------------');
+   disp('Point X:');
+   disp(p1);
+   disp(xpoints);
+   disp('Point Y:');
+   disp(ypoints);
+   disp('----------------');
    zpoints = [0 0];
    for g=1:sizeE(1) %y
         for t=1:sizeE(2) %x
@@ -295,8 +312,8 @@ for i=1:sizeEd(1)
       end
    end
    hold on
-%      plot3(xpoints, ypoints, zpoints,'linewidth',0.1,'Color',[0.5 0.5 1]);
-   %plot3(xpoints, ypoints, zpoints,'-y');
+%    plot3(xpoints, ypoints, zpoints,'linewidth',0.1,'Color',[0 0 0]);
+%    plot3(xpoints, ypoints, zpoints,'-y');
 end
 
 
@@ -439,26 +456,37 @@ temp=0;
 
 
 %iki opo
-
+tick=0;
   for i=2:b
-%     xf = path(i-1,2);
-%     yf = path(i-1,1);
-%     zf = path(i-1,3);
-%     xe = path(i,2);
-%     ye = path(i,1);
-%     ze = path(i,3);
-
+%     if i<9
+%         xf = path(i-1,2);
+%         yf = path(i-1,1);
+%         zf = path(i-1,3);
+%         xe = path(i,2);
+%         ye = path(i,1);
+%         ze = path(i,3);
+%         
+%         n_max = (xe-xf)/0.01;
+        
+        
+%     end
+    
     xf = X(1,i-1);
     yf = Y(1,i-1);
     zf = Z(1,i-1);
     xe = X(1,i);
     ye = Y(1,i);
     ze = Z(1,i);
-    delta = abs(xf - xe);
-    disp(delta);
     
-        n_max = (xe-xf)/0.02;
-
+    
+    delta = abs(xf - xe);
+    %disp(delta);
+    
+    if delta > 2 
+        n_max = (xe-xf)/0.01;
+    else
+        n_max=2;
+    end 
         
     if xe - xf > 2
         heading = heading + 1;
@@ -515,7 +543,8 @@ temp=0;
         psi = rad -(6.28/4);
         s(9) = psi;
         
-        s(13) = ((vx-x)/(dt*100))*3600;
+        s(13) = ((vx-x)/(dt*1000))*3600;
+        s(13) = round(s(13));
         
         Pmatrix(1,c) = vx;
         Pmatrix(2,c) = vy;    
@@ -524,20 +553,20 @@ temp=0;
     pn       =  s(2);       % y position     
     pe       =  s(1);       % Pmatrix(1,c-1);       % x position
     pd       =  s(3);       % Pmatrix(3,c-1);       % z position
-    disp(s);
+    %disp(s);
     
     
     drawBody(Vertices,Faces,facecolors,...
                      pn,pe,pd,-phi,theta,psi,...
                      aircraft_handle);
-    tic=tic+1;
-%     if(tic==10) 
-%         time=time+1;
-%         tic=0;
-%     end
+    tick=tick+1;
+    if(tick==12) 
+        time=time+1;
+        tick=0;
+    end
     
     xlabel(s(13))
-    ylabel(tic)
+    ylabel(time)
     
     %hold off
     end

@@ -1,0 +1,58 @@
+%Manuverwaypoint = 
+amount=size(UAV1P(:,1));
+
+% iterasi=zeros(amount,1);
+iter=2;
+done=0;
+flags=0;
+while flags == 0
+    y1=UAV1P(iter,2);
+    y2=UAV1P(iter-1,2);
+    
+    if done == 0 
+        if y1 < 1
+           done = 8;
+        end
+    end
+    
+    if done == 8 
+        if y1 < -2
+           done = 9;
+        end
+    end
+    
+    if done == 9 
+        if y1 > -1 && y1 < 1
+           xn(2) = UAV1P(iter,2);
+           yn(2) = UAV1P(iter,1);
+           done = 1;
+        end
+    end
+    
+    if done == 1
+        if y1 > 190
+            if y1 - y2 < 0
+               xn1(2) = UAV1P(iter,2);
+               yn1(2) = UAV1P(iter,1);
+               done = 2;
+            end
+        end
+    end 
+    
+    if done == 2
+            delx = xn1(2)-xn(2);
+            dely = yn1(2)-yn(2);
+            ghe(1) = atan2d(dely,delx);
+            if ghe(1) < 0
+                ghe(1) = ghe(1)+360;
+            end
+            ghe(1) = round(ghe(1));
+            done = 3;
+    end
+    
+    if done == 3
+        flags = 1;
+    end
+    
+    iter = iter +1;
+end

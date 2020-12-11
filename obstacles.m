@@ -1,36 +1,5 @@
-%path parameters
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-sizeE=[150 150 30];
-d_grid=1;
-
-%size [y,x,z] and resolution
-
-%Starting point
-x0=5;
-y0=5;
-z0=10;
-
-%Arrival point
-xend=125;
-yend=140;
-zend=10;
-
-
-%% Defining environment variables
-start = [x0,y0];                                % start position
-goal = [xend, yend];                            % goal position
-%n = 2;                                         % no. of obstacles
-
-
-%Number of points with low elevation around start and end point area 
-n_low=3;
-
-%Theta * cost weights
-kg=1;
-kh=1.25;
-ke=sqrt((xend-x0)^2+(yend-y0)^2+(zend-z0)^2);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+ function [Map,Pend,P0,h,keys,values,key,nodes,len] = obstacles(xend,yend,zend,y0,x0,z0,start,goal)
+% 
 %Map definition
 %Average flight altitude
 h=max(z0,zend);
@@ -38,6 +7,8 @@ h=max(z0,zend);
 %Points coordinates in [y,x,z] format
 P0=[y0 x0 z0];
 Pend=[yend xend zend];
+
+
 %Generate map
 
 keys = {'a',... 
@@ -97,6 +68,12 @@ nodes={          [20,10], [20,10], [20,10], [20,10],...
                  [20,30], [20,30], [40,30], [40,30],...
                  [40,30], [40,30], [40,30], [40,30],...
                 };  
-titik = [20,10,5];
+%titik = [20,10,5];
 %values = {};
 %values = [values start];
+
+
+   
+Map = containers.Map(keys, values);
+len = Map.values;
+ end

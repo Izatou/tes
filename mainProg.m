@@ -2,7 +2,7 @@
 clc
 clear
 %option 1 for normal path, option 2 for bezzier curve path
-ops=2;
+ops=1;
 
 %path parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -153,11 +153,11 @@ end
 %% Removing the diagonals of the obstacle from the visible edges
 length = size(key);    % this contains the number of nodes
 i = 2;
-while i < (length(2)-2)
-    G = rmedge(G,key{i}, key{i+2});
-    G = rmedge(G,key{i+1}, key{i+3});
-    i = i + 4;
-end
+% while i < (length(2)-2)
+%     G = rmedge(G,key{i}, key{i+2});
+%     G = rmedge(G,key{i+1}, key{i+3});
+%     i = i + 4;
+% end
 visEd = G.Edges;  % visible edges
  sizeEd = size(G.Edges);
 
@@ -266,17 +266,38 @@ for i=1:sizeEd(1)
 end
 
 
-
-surf(y_grid(2:end-1),x_grid(2:end-1),E(2:end-1,2:end-1))
+% [x , y] = values(1,1);
+ surf(x_grid(2:end-1),y_grid(2:end-1),E(2:end-1,2:end-1))
 shading interp
-plot3(xpoints, ypoints, zpoints,'-y');
 
+        Pmatrix = [ (linspace( 20, 20,5));
+                    (linspace( 10, 10,5));
+                    (linspace(0,10,5))];  
+ plot3(Pmatrix(1,:), Pmatrix(2,:), Pmatrix(3,:),'ko');
+
+         Pmatrix = [ (linspace( 20, 20,5));
+                    (linspace( 30, 30,5));
+                    (linspace(0,10,5))];  
+ plot3(Pmatrix(1,:), Pmatrix(2,:), Pmatrix(3,:),'ko');
+
+         Pmatrix = [ (linspace( 30, 30,5));
+                    (linspace( 40, 40,5));
+                    (linspace(0,15,5))];  
+ plot3(Pmatrix(1,:), Pmatrix(2,:), Pmatrix(3,:),'ko');
+
+          Pmatrix = [ (linspace( 10, 10,5));
+                    (linspace( 40, 40,5));
+                    (linspace(0,15,5))];  
+ plot3(Pmatrix(1,:), Pmatrix(2,:), Pmatrix(3,:),'ko');
+ plot3(30, 20, 10,'ko');
+ 
+ 
 % colormap winter
 hold on
-plot3(x0,y0,z0,'gs')
-plot3(xend,yend,zend,'rd')
-plot3(path(:,2),path(:,1),path(:,3),'wx')
-plot3(path(:,2),path(:,1),path(:,3),'linewidth',1,'Color',[0 0 1])
+% plot3(x0,y0,z0,'gs')
+% plot3(xend,yend,zend,'rd')
+% plot3(path(:,2),path(:,1),path(:,3),'wx')
+% plot3(path(:,2),path(:,1),path(:,3),'linewidth',1,'Color',[0 0 1])
 % plot3(a,b,c,'linewidth',4,'Color',[1 0 0]);
 axis tight
 axis equal
@@ -358,6 +379,15 @@ for ij =1:a
     fz(ij) = path(ij,3); %z
 end    
 
+height = 0;
+for ij =2:a
+    ze=path(ij,3); %z
+    zf = path(ij-1,3); %z
+    if ze - zf ~= 0   
+        height = height +1;
+    end
+end    
+
 [X,Y,Z] = pathsmoothbezier(fx,fy,fz,curvature);
 hold on
 
@@ -374,6 +404,7 @@ disp('Banyaknya Node belok = ');
 disp(e -2);
 disp('Banyaknya Node bezzier curve = ');
 disp(b -2);
+pause(5);
 % plot3(X,Y,Z,'linewidth',2,'Color',[1 0 1]);
 
 hold off
@@ -430,7 +461,6 @@ elseif ops == 2
 %DSFSDFS
 time=0;
 flag = 1;
-height = 0;
 heading = -1;
 temp=0;
 
@@ -450,9 +480,6 @@ tick=0;
         ye = path(i,1);
         ze = path(i,3);
      
-        if ze - zf ~= 0   
-            height = height +1;
-        end
         
     elseif ops == 2
         xf = X(1,i-1);
@@ -461,25 +488,7 @@ tick=0;
         xe = X(1,i);
         ye = Y(1,i);
         ze = Z(1,i);
-          
-        temp = round(ze);
-        if ze == temp 
-            if flags==0
-                count = count +1;
-                flags=1;
-            end
-        end
-        if ze ~= temp
-            if flags==1
-                count = count +1;
-                flags=0;
-            end
-        end
-
-        if count>2
-            height = height+1;
-            count=0;
-        end
+      
     end
     
     delta = abs(xf - xe);
@@ -534,15 +543,15 @@ tick=0;
         
         s(13) = ((vx-x)/(dt*1000))*3600;
         s(13) = round(s(13));
-        
+        s(15) = heading;
         Pmatrix(1,c) = vx;
         Pmatrix(2,c) = vy;    
         Pmatrix(3,c) = vz;
-        s(14) = height;
+        s(16) = height;
     pn       =  s(2);       % y position     
     pe       =  s(1);       % Pmatrix(1,c-1);       % x position
     pd       =  s(3);       % Pmatrix(3,c-1);       % z position
-    disp(s);
+
     
     drawBody(Vertices,Faces,facecolors,...
                      pn,pe,pd,-phi,theta,psi,...
@@ -556,6 +565,7 @@ tick=0;
     xlabel(s(13));
     ylabel(round(toc))
     
+        s(14) = round(toc);    disp(s);
     %hold off
     end
     

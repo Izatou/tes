@@ -1,7 +1,8 @@
 %Main
 clc
 clear
-
+%option 1 for normal path, option 2 for bezzier curve path
+ops=2;
 
 %path parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -264,8 +265,12 @@ for i=1:sizeEd(1)
 %    plot3(xpoints, ypoints, zpoints,'-y');
 end
 
+
+
 surf(y_grid(2:end-1),x_grid(2:end-1),E(2:end-1,2:end-1))
 shading interp
+plot3(xpoints, ypoints, zpoints,'-y');
+
 % colormap winter
 hold on
 plot3(x0,y0,z0,'gs')
@@ -377,28 +382,50 @@ hold off
 %UAV motion
 %------------------------------------------
 
+% figure(4), clf
+% hold on
+if ops == 1
+    iter=a;
+    phi      = 0;           % roll angle         
+    theta    = 0;           % pitch angle     
+    %psi      = 3.14;       % yaw angle  
+    x1 = path(1,1);
+    y1 = path(1,2);
+    x2 = path(2,1);
+    y2 = path(2,2);
+    psi = (atan2d(x1*y2-y1*x2,x1*x2+y1*y2))*(3.14/180); 
 
-%figure(4), clf
-hold on
-phi      = 0;           % roll angle         
-theta    = 0;           % pitch angle     
-%psi      = 3.14;       % yaw angle  
-x1 = X(1,1);    %path(1,1);
-y1 = Y(1,1);    %path(1,2);
-x2 = X(1,2);    %path(2,1);
-y2 = Y(1,2);    %path(2,2);
-psi = (atan2d(x1*y2-y1*x2,x1*x2+y1*y2))*(3.14/180); 
+    pn       =  path(1,2);         % y position     
+    pe       =  path(1,1);         % x position
+    pd       = -path(1,3);         % z position
 
-pn       =  X(1,1);      %path(1,2);         % y position     
-pe       =  Y(1,1);      %path(1,1);         % x position
-pd       = -Z(1,1);     %-path(1,3);        % z position
+    [Vertices,Faces,facecolors] = defineAircraftBody;                
+    aircraft_handle = drawBody(Vertices,Faces,facecolors,...
+                                       pn,pe,pd,phi,theta,psi,...
+                                       [], 'normal');
 
-[Vertices,Faces,facecolors] = defineAircraftBody;                
-aircraft_handle = drawBody(Vertices,Faces,facecolors,...
-                                   pn,pe,pd,phi,theta,psi,...
-                                   [], 'normal');
-                               hold off
+elseif ops == 2
+    iter = b-1;
+    phi      = 0;           % roll angle         
+    theta    = 0;           % pitch angle     
+    %psi      = 3.14;       % yaw angle  
+    x1 = X(1,1);    %path(1,1);
+    y1 = Y(1,1);    %path(1,2);
+    x2 = X(1,2);    %path(2,1);
+    y2 = Y(1,2);    %path(2,2);
+    psi = (atan2d(x1*y2-y1*x2,x1*x2+y1*y2))*(3.14/180); 
 
+    pn       =  X(1,1);      %path(1,2);         % y position     
+    pe       =  Y(1,1);      %path(1,1);         % x position
+    pd       = -Z(1,1);     %-path(1,3);        % z position
+
+    [Vertices,Faces,facecolors] = defineAircraftBody;                
+    aircraft_handle = drawBody(Vertices,Faces,facecolors,...
+                                       pn,pe,pd,phi,theta,psi,...
+                                       [], 'normal');
+ end
+%                                hold off
+                               
 %[b a] = (size(X));
 %DSFSDFS
 time=0;
@@ -410,28 +437,50 @@ temp=0;
 
 
 %iki opo
+count=0;
+flags=0;
+tic
 tick=0;
-  for i=2:b
-%     if i<9
-%         xf = path(i-1,2);
-%         yf = path(i-1,1);
-%         zf = path(i-1,3);
-%         xe = path(i,2);
-%         ye = path(i,1);
-%         ze = path(i,3);
-%         
-%         n_max = (xe-xf)/0.01;
+  for i=2:iter
+    if ops == 1
+        xf = path(i-1,2);
+        yf = path(i-1,1);
+        zf = path(i-1,3);
+        xe = path(i,2);
+        ye = path(i,1);
+        ze = path(i,3);
+     
+        if ze - zf ~= 0   
+            height = height +1;
+        end
         
-        
-%     end
-    
-    xf = X(1,i-1);
-    yf = Y(1,i-1);
-    zf = Z(1,i-1);
-    xe = X(1,i);
-    ye = Y(1,i);
-    ze = Z(1,i);
-    
+    elseif ops == 2
+        xf = X(1,i-1);
+        yf = Y(1,i-1);
+        zf = Z(1,i-1);
+        xe = X(1,i);
+        ye = Y(1,i);
+        ze = Z(1,i);
+          
+        temp = round(ze);
+        if ze == temp 
+            if flags==0
+                count = count +1;
+                flags=1;
+            end
+        end
+        if ze ~= temp
+            if flags==1
+                count = count +1;
+                flags=0;
+            end
+        end
+
+        if count>2
+            height = height+1;
+            count=0;
+        end
+    end
     
     delta = abs(xf - xe);
     %disp(delta);
@@ -446,20 +495,7 @@ tick=0;
         heading = heading + 1;
     end    
 
-    if ze - zf ~= 0
-        flag = 0;
-    end
-
-    if ze - zf == 0
-        if flag == 0
-        temp = temp +1 ;
-        if temp > 5
-            height = height +1;
-            temp = 0;
-            flag =1;
-        end
-        end
-    end
+    
         
         Pmatrix = [ (linspace( xf, xe,n_max));
                     (linspace( yf, ye,n_max));
@@ -467,7 +503,6 @@ tick=0;
     
     
     for c = 2:n_max
-
             Z1 = Pmatrix(3,c-1);
             Z2 = Pmatrix(3,c);
             Y1 = Pmatrix(2,c-1);
@@ -503,12 +538,11 @@ tick=0;
         Pmatrix(1,c) = vx;
         Pmatrix(2,c) = vy;    
         Pmatrix(3,c) = vz;
-        
+        s(14) = height;
     pn       =  s(2);       % y position     
     pe       =  s(1);       % Pmatrix(1,c-1);       % x position
     pd       =  s(3);       % Pmatrix(3,c-1);       % z position
-    %disp(s);
-    
+    disp(s);
     
     drawBody(Vertices,Faces,facecolors,...
                      pn,pe,pd,-phi,theta,psi,...
@@ -519,8 +553,8 @@ tick=0;
         tick=0;
     end
     
-    xlabel(s(13))
-    ylabel(time)
+    xlabel(s(13));
+    ylabel(round(toc))
     
     %hold off
     end
